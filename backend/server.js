@@ -21,9 +21,8 @@ app.get("/", UserAuth, async (req, res) => {
     }   
 });
 
-app.post("/", async (req, res) => {
-    console.log("POST request received");
-    console.log("Request body:", req.body);
+app.post("/", UserAuth, async (req, res) => {
+
     
     const Blog = req.body;
 
@@ -34,6 +33,7 @@ app.post("/", async (req, res) => {
         
 
     try {
+        Blog.userId = req.user.id; // Associate blog with the authenticated user
       const newBlog = new blog(Blog);
         await newBlog.save();
         console.log("Blog saved successfully");
@@ -43,7 +43,7 @@ app.post("/", async (req, res) => {
         res.status(500).json({success: false, message: "Server error"});
     }
 });
-app.put("/:id", async (req, res) => {
+app.put("/:id", UserAuth, async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
 
@@ -58,7 +58,7 @@ app.put("/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-app.delete("/:id", async(req, res) => {
+app.delete("/:id", UserAuth, async(req, res) => {
     const {id} = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -86,4 +86,4 @@ const startServer = async () => {
     }
 };
 
-startServer();
+startServer();'/4'
