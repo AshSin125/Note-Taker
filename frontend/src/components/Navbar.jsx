@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   // Remove body margin when Navbar mounts
@@ -31,12 +31,12 @@ function Navbar() {
               >
                 Create
               </Link>
-          <Link
-            to="/login"
-            className="text-white hover:bg-orange-200 block px-3 py-2 rounded-md text-base font-medium"
-            >
-            Login
-          </Link>
+              <Link
+                to="/login"
+                className="text-white hover:bg-orange-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Login
+              </Link>
               
             </div>
           </div>

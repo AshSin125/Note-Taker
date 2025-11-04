@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import UserAuth from "./MiddleWear/userdataAuth";
+import jwt from "jsonwebtoken";
+import UserAuth from "./MiddleWear/userdataAuth.js";
+import userModel from "../User_Models.js";
+import transporter from "./nodemailer.js";
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
@@ -26,42 +29,52 @@ export const login = async (req, res) => {
     }
 };
 export const register = async (req, res) => {
-    const { name, email, password } = req.body
+    // accept either `name` or `username` from the client for convenience
+    const { username, email, password, name } = req.body
+    const resolvedUsername = username || name;
 
-    if(!name  || !email || !password) {
+    if(!resolvedUsername || !email || !password) {
         return res.status(400).json({success: false, message: "Please fill in all fields"});
     }
     try {
-        const existingUser =await user.findOne({email });
+        const existingUser = await userModel.findOne({email});
         if(existingUser) {
             return res.status(400).json({success: false, message: "User already exists"});
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new user({
-            name ,
+        const newUser = new userModel({
+            username: resolvedUsername,
             email,
             password: hashedPassword,
         });
         await newUser.save();
-        res.status(201).json({success: true, message: "User registered successfully"});
-
+        // generate token and set cookie
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
         res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
+        // Send welcome email (non-blocking) but log any failure
+        (async () => {
+            try {
+                const mailOptions = {
+                    // From address should be a verified sender in your SMTP provider (Brevo)
+                    from: process.env.SENDER_EMAIL || process.env.SMTP_USER,
+                    to: email,
+                    subject: 'Welcome to Our Service',
+                    text: `Hello ${resolvedUsername},\n\nThank you for registering with us! Your account has been successfully created with email: ${email}\n\nBest regards,\nThe Team`
+                }
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Welcome to Our Service',
-            text: `Hello ${name},\n\nThank you for registering with us! Your account has been successfully created ${email}`
-        };
+                const info = await transporter.sendMail(mailOptions);
+                console.log('Welcome email sent successfully to:', email, 'info:', info);
+            } catch (emailError) {
+                console.error('Email sending failed for', email, emailError);
+            }
+        })();
 
-        await transporter.sendMail(mailOptions);
-          res.json({success: true, message: 'User registered successfully'});
+        // Respond once to the client
+        return res.status(201).json({success: true, message: 'User registered successfully'});
     } catch (error) {
         console.error(error);
-        res.status(500).json({success: false, message: "Server error"});
+        res.status(500).json({success: false, message: error.message});
     }
 
     

@@ -2,9 +2,9 @@ import { Route, Routes } from 'react-router-dom'
 import HomePage from './pages/Home'
 import CreatePage from './pages/Create'
 import UpdatePage from './pages/updatePage'
-import ShowBlog from './componets/showBlog'
+import ShowBlog from './components/showBlog'
 import Loginpage from './pages/Loginpage'
-import Navbar from './componets/Navbar'
+import Navbar from './components/Navbar'
 
 
 function App() {

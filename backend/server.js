@@ -5,13 +5,21 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import UserAuth from "./MiddleWear/userdataAuth.js";
+import authRouter from "./UserRoute.js";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173", // Your frontend URL
+    credentials: true
+}));
 
-app.get("/", UserAuth, async (req, res) => {
+// Add auth routes - change from /api/auth to /api to match frontend calls
+app.use("/api", authRouter);
+
+// Blog routes - move to /api/blogs to avoid conflicts
+app.get("/api/blogs", UserAuth, async (req, res) => {
     try {
         const info = await blog.find({userId : req.user.id}); // Fetch blogs for the authenticated user
         res.status(200).json({success: true, data: info});
@@ -21,7 +29,7 @@ app.get("/", UserAuth, async (req, res) => {
     }   
 });
 
-app.post("/", UserAuth, async (req, res) => {
+app.post("/api/blogs", UserAuth, async (req, res) => {
     
     const Blog = req.body;
 
@@ -42,7 +50,7 @@ app.post("/", UserAuth, async (req, res) => {
         res.status(500).json({success: false, message: "Server error"});
     }
 });
-app.put("/:id", UserAuth, async (req, res) => {
+app.put("/api/blogs/:id", UserAuth, async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
 
@@ -57,7 +65,7 @@ app.put("/:id", UserAuth, async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-app.delete("/:id", UserAuth, async(req, res) => {
+app.delete("/api/blogs/:id", UserAuth, async(req, res) => {
     const {id} = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -85,4 +93,4 @@ const startServer = async () => {
     }
 };
 
-startServer();'/4'
+startServer();

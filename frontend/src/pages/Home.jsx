@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { written } from "../API/API";
-import BlogIcon from "../componets/blogIcon";
+import BlogIcon from "../components/blogIcon";
 
 function HomePage(){
     const {products, fetchBlogs} = written();

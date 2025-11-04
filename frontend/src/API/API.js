@@ -18,11 +18,12 @@ export const written = create((set) => ({
 			return { success: false, message: "Please fill in everything" }
     }
     
-    const res = await fetch("http://localhost:3001/", {
+    const res = await fetch("http://localhost:3001/api/blogs", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
+        credentials: 'include',
         body: JSON.stringify(newproduct)
     });
     const data = await res.json();
@@ -30,16 +31,19 @@ export const written = create((set) => ({
     return { success: true, message: "Product created successfully" };
 },
 fetchBlogs: async () => {
-    const res = await fetch("http://localhost:3001/");
+    const res = await fetch("http://localhost:3001/api/blogs", {
+        credentials: 'include'
+    });
 		const data = await res.json();
         set({ products: data.data });
     },
     updateBlog: async (pid, updatedProduct) => {
-		const res = await fetch(`http://localhost:3001/${pid}`, {
+		const res = await fetch(`http://localhost:3001/api/blogs/${pid}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
 			},
+			credentials: 'include',
 			body: JSON.stringify(updatedProduct),
 		});
 		const data = await res.json();
@@ -52,8 +56,9 @@ fetchBlogs: async () => {
 		return { success: true, message: data.message };
 	},
 	deleteBlog: async (pid) => {
-		const res = await fetch(`http://localhost:3001/${pid}`, {
+		const res = await fetch(`http://localhost:3001/api/blogs/${pid}`, {
 			method: "DELETE",
+			credentials: 'include'
 		});
 		const data = await res.json();
 		if (!data.success) return { success: false, message: data.message };

@@ -8,7 +8,7 @@ const useUserStore = zustand((set) => ({
 
     getUserData : async () => {
         try {
-            const res = await fetch('http://localhost:3001/api/auth/user', {
+            const res = await fetch('http://localhost:3001/api/is-auth', {
                 method: 'GET',
                 credentials: 'include', // Include cookies for authentication
             });
@@ -24,7 +24,7 @@ const useUserStore = zustand((set) => ({
     },
     getAuthstatus: async () => {
         try {
-            const res = await fetch('http://localhost:3001/api/auth/is-auth', {
+            const res = await fetch('http://localhost:3001/api/is-auth', {
                 method: 'GET',
                 credentials: 'include', // Include cookies for authentication
             });
@@ -38,6 +38,7 @@ const useUserStore = zustand((set) => ({
             return { success: false, message: "Internal server error" };
         }
     },
+
 
 }));
 
